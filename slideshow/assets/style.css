@@ -1,0 +1,41 @@
+.container{
+    width: 80%;
+    margin: 0 auto;
+    min-height: 100vh;   
+}
+.align-vertical{
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+.hero{
+    width: 100%;
+    height: 100%;
+}
+.slider{
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.6);
+    position: relative;
+}
+.slider-img-container{
+    height: 100%;width: 100%;
+}
+.slider-img-container img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.next, .prev{
+    position: absolute;
+    font-size: 5rem;
+    color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.next{
+    right: 0;
+}
