@@ -8,6 +8,9 @@ const currentTimeElem = document.querySelector(".current-time");
 const totalTimeElem = document.querySelector(".total-time");
 const captionsBtn = document.querySelector(".captions-btn");
 const speedBtn = document.querySelector(".speed-btn");
+const timelineContainer = document.querySelector(".timeline-container");
+const previewImg = document.querySelector(".preview-img");
+const thumbnailImg = document.querySelector(".thumbnail-img");
 const videoContainer = document.querySelector(".video-container");
 const video = document.querySelector("video");
 
@@ -48,6 +51,50 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// Timeline
+timelineContainer.addEventListener("mousemove", handleTimelineUpdate);
+timelineContainer.addEventListener("mousedown", toggleScrubbing);
+document.addEventListener("mouseup", (e) => {
+  if (isScrubbing) toggleScrubbing(e);
+});
+document.addEventListener("mousemove", (e) => {
+  if (isScrubbing) handleTimelineUpdate(e);
+});
+
+let isScrubbing = false;
+let wasPaused;
+function toggleScrubbing(e) {
+  const rect = timelineContainer.getBoundingClientRect();
+  const percent = Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
+  isScrubbing = (e.buttons & 1) === 1;
+  videoContainer.classList.toggle("scrubbing", isScrubbing);
+  if (isScrubbing) {
+    video.pause();
+  } else {
+    video.currentTime = percent * video.duration;
+    if (!wasPaused) video.play();
+  }
+  handleTimelineUpdate(e);
+}
+
+function handleTimelineUpdate(e) {
+  const rect = timelineContainer.getBoundingClientRect();
+  const percent = Math.min(Math.max(0, e.x - rect.x), rect.width) / rect.width;
+  const previewImgNumber = Math.max(
+    1,
+    Math.floor((percent * video.duration) / 10)
+  );
+  previewImgSrc = `./assets/previewImgs/preview${previewImgNumber}.jpg`;
+  previewImg.src = previewImgSrc;
+  timelineContainer.style.setProperty("--preview-position", percent);
+
+  if (isScrubbing) {
+    e.preventDefault();
+    thumbnailImg.src = previewImgSrc;
+    timelineContainer.style.setProperty("--progress-position", percent);
+  }
+}
+
 // Playback speed
 speedBtn.addEventListener("click", changePlayBackSpeed);
 
@@ -77,6 +124,8 @@ video.addEventListener("loadeddata", () => {
 
 video.addEventListener("timeupdate", () => {
   currentTimeElem.textContent = formatDuration(video.currentTime);
+  const percent = video.currentTime / video.duration;
+  timelineContainer.style.setProperty("--progress-position", percent);
 });
 
 const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
